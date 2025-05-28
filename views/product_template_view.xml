@@ -25,10 +25,6 @@
                                                     <div class="oe_kanban_details">
                                                         <strong><t t-esc="record.name.value"/></strong>
                                                         <br/>
-                                                        <button type="object"
-                                                                name="set_main_image"
-                                                                string="Establecer como principal"
-                                                                class="btn btn-primary btn-sm"/>
                                                     </div>
                                                 </div>
                                             </t>
