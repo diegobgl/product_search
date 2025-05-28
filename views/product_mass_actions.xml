@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+
+        <!-- Acción masiva: Buscar imágenes por código de barras -->
+        <record id="action_mass_search_google_images" model="ir.actions.server">
+            <field name="name">Buscar imágenes (por Código de Barras)</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="binding_model_id" ref="product.model_product_template"/>
+            <field name="state">code</field>
+            <field name="binding_view_types">list</field>
+            <field name="code">
+                for product in records:
+                    product.search_google_images()
+            </field>
+        </record>
+
+        <!-- Acción masiva: Buscar imágenes por nombre -->
+        <record id="action_mass_search_google_images_by_name" model="ir.actions.server">
+            <field name="name">Buscar imágenes (por Nombre)</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="binding_model_id" ref="product.model_product_template"/>
+            <field name="state">code</field>
+            <field name="binding_view_types">list</field>
+            <field name="code">
+                for product in records:
+                    product.search_google_images_by_name()
+            </field>
+        </record>
+
+        <!-- Acción masiva: Eliminar imágenes -->
+        <record id="action_mass_delete_google_images" model="ir.actions.server">
+            <field name="name">Eliminar todas las imágenes</field>
+            <field name="model_id" ref="product.model_product_template"/>
+            <field name="binding_model_id" ref="product.model_product_template"/>
+            <field name="state">code</field>
+            <field name="binding_view_types">list</field>
+            <field name="code">
+                for product in records:
+                    product.delete_all_images()
+            </field>
+        </record>
+
+    </data>
+</odoo>
