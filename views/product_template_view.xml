@@ -12,19 +12,17 @@
                 <xpath expr="//field[@name='description']" position="after">
                         <notebook>
                             <page string="Imágenes">
-                                <field name="image_ids" widget="kanban" options="{'kanban_group_by': False}">
+                                <field name="image_ids">
                                     <kanban>
                                         <field name="image"/>
-                                        <field name="name"/>
                                         <templates>
                                             <t t-name="kanban-box">
-                                                <div class="oe_kanban_global_click">
+                                                <div>
                                                     <img t-if="record.image.value"
                                                         t-att-src="'data:image/png;base64,' + record.image.value"
-                                                        style="max-width: 150px; max-height: 150px;"/>
-                                                    <div class="oe_kanban_details">
-                                                        <strong><t t-esc="record.name.value"/></strong>
-                                                        <br/>
+                                                        style="max-width: 150px; max-height: 150px;" />
+                                                    <div>
+                                                        <t t-esc="record.name.value"/>
                                                     </div>
                                                 </div>
                                             </t>
@@ -32,6 +30,7 @@
                                     </kanban>
                                 </field>
                             </page>
+
                         </notebook>
                     </xpath>
             </field>
