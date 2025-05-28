@@ -13,10 +13,12 @@
                         <notebook>
                             <page string="Imágenes">
                                 <field name="image_ids">
-                                    <tree>
-                                        <field name="image" widget="image"/>
-                                        <field name="name"/>
-                                    </tree>
+                                    <form>
+                                        <group>
+                                            <field name="image" widget="image"/>
+                                            <field name="name"/>
+                                        </group>
+                                    </form>
                                 </field>
                             </page>
                         </notebook>
