@@ -25,15 +25,11 @@ class ProductTemplate(models.Model):
             return False
 
     def search_google_images(self):
-        TITULOS_INVALIDOS = ['pdf', 'ficha', 'documento', 'manual', 'datasheet']
         for product in self.filtered(lambda p: p.barcode):
             barcode = product.barcode
             api_key = 'AIzaSyAz1mcdCw-x9FQy_GJK0mkGUSqHh438bkE'
             cx = '3514c820cfa4f46ab'
-            url = (
-                f'https://www.googleapis.com/customsearch/v1?q={barcode}&cx={cx}'
-                f'&searchType=image&gl=cl&hl=es&imgType=photo&safe=active&key={api_key}'
-            )
+            url = f'https://www.googleapis.com/customsearch/v1?q={barcode}&cx={cx}&searchType=image&key={api_key}'
 
             try:
                 response = requests.get(url, timeout=30)
@@ -44,34 +40,23 @@ class ProductTemplate(models.Model):
             image_results = response.json().get('items', [])[:5]
             for image_result in image_results:
                 try:
-                    title = image_result.get('title', '').lower()
-                    if any(inval in title for inval in TITULOS_INVALIDOS):
-                        continue
-                    image_resp = requests.get(image_result['link'], timeout=10)
-                    if not image_resp.headers.get('Content-Type', '').startswith('image/'):
-                        continue
-                    image_data = image_resp.content
-                    if self._es_imagen_valida(image_data):
-                        image_base64 = base64.b64encode(image_data).decode('utf-8')
-                        self.env['product.image'].create({
-                            'name': image_result['title'],
-                            'image': image_base64,
-                            'product_tmpl_id': product.id,
-                        })
+                    image_data = requests.get(image_result['link'], timeout=10).content
+                    image_base64 = base64.b64encode(image_data).decode('utf-8')
+                    self.env['product.image'].create({
+                        'name': image_result['title'],
+                        'image': image_base64,
+                        'product_tmpl_id': product.id,
+                    })
                 except:
                     continue
         return True
 
     def search_google_images_by_name(self):
-        TITULOS_INVALIDOS = ['pdf', 'ficha', 'documento', 'manual', 'datasheet']
         for product in self.filtered(lambda p: p.name):
             product_name = product.name
             api_key = 'AIzaSyAz1mcdCw-x9FQy_GJK0mkGUSqHh438bkE'
             cx = '3514c820cfa4f46ab'
-            url = (
-                f'https://www.googleapis.com/customsearch/v1?q={product_name}&cx={cx}'
-                f'&searchType=image&gl=cl&hl=es&imgType=photo&safe=active&key={api_key}'
-            )
+            url = f'https://www.googleapis.com/customsearch/v1?q={product_name}&cx={cx}&searchType=image&key={api_key}'
 
             try:
                 response = requests.get(url, timeout=30)
@@ -82,23 +67,17 @@ class ProductTemplate(models.Model):
             image_results = response.json().get('items', [])[:5]
             for image_result in image_results:
                 try:
-                    title = image_result.get('title', '').lower()
-                    if any(inval in title for inval in TITULOS_INVALIDOS):
-                        continue
-                    image_resp = requests.get(image_result['link'], timeout=10)
-                    if not image_resp.headers.get('Content-Type', '').startswith('image/'):
-                        continue
-                    image_data = image_resp.content
-                    if self._es_imagen_valida(image_data):
-                        image_base64 = base64.b64encode(image_data).decode('utf-8')
-                        self.env['product.image'].create({
-                            'name': image_result['title'],
-                            'image': image_base64,
-                            'product_tmpl_id': product.id,
-                        })
+                    image_data = requests.get(image_result['link'], timeout=10).content
+                    image_base64 = base64.b64encode(image_data).decode('utf-8')
+                    self.env['product.image'].create({
+                        'name': image_result['title'],
+                        'image': image_base64,
+                        'product_tmpl_id': product.id,
+                    })
                 except:
                     continue
         return True
+
 
     def set_main_image(self):
         self.ensure_one()
