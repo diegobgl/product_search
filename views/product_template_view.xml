@@ -13,24 +13,12 @@
                         <notebook>
                             <page string="Imágenes">
                                 <field name="image_ids">
-                                    <kanban>
-                                        <field name="image"/>
-                                        <templates>
-                                            <t t-name="kanban-box">
-                                                <div>
-                                                    <img t-if="record.image.value"
-                                                        t-att-src="'data:image/png;base64,' + record.image.value"
-                                                        style="max-width: 150px; max-height: 150px;" />
-                                                    <div>
-                                                        <t t-esc="record.name.value"/>
-                                                    </div>
-                                                </div>
-                                            </t>
-                                        </templates>
-                                    </kanban>
+                                    <tree>
+                                        <field name="image" widget="image"/>
+                                        <field name="name"/>
+                                    </tree>
                                 </field>
                             </page>
-
                         </notebook>
                     </xpath>
             </field>
