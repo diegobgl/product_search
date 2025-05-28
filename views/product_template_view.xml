@@ -6,13 +6,20 @@
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
-                <xpath expr="//notebook" position="inside">
-                    <page string="Imágenes">
+                <xpath expr="//page[@name='invoicing']" position="after">
+                    <page string="Imágenes externas">
+                        <field name="script" widget="html" colspan="4"/>
                         <field name="image_ids">
                             <tree>
                                 <field name="image" widget="image"/>
                                 <field name="name"/>
                             </tree>
+                            <form>
+                                <group>
+                                    <field name="image" widget="image"/>
+                                    <field name="name"/>
+                                </group>
+                            </form>
                         </field>
                     </page>
                 </xpath>
