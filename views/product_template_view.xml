@@ -13,6 +13,7 @@
                             <tree>
                                 <field name="image" widget="image"/>
                                 <field name="name"/>
+                                <button name="set_as_main" string="Usar como principal" type="object" class="btn-primary"/>
                             </tree>
                             <form>
                                 <group>
