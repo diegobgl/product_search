@@ -27,8 +27,8 @@ class ProductTemplate(models.Model):
     def search_google_images(self):
         for product in self.filtered(lambda p: p.barcode):
             barcode = product.barcode
-            api_key = 'AIzaSyAz1mcdCw-x9FQy_GJK0mkGUSqHh438bkE'
-            cx = '3514c820cfa4f46ab'
+            api_key = ''
+            cx = ''
             url = f'https://www.googleapis.com/customsearch/v1?q={barcode}&cx={cx}&searchType=image&key={api_key}'
 
             try:
