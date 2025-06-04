@@ -1,21 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- views/res_config_settings_views.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <record id="view_config_settings_product_search" model="ir.ui.view">
         <field name="name">res.config.settings.product.search</field>
         <field name="model">res.config.settings</field>
-        <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+        <field name="inherit_id" ref="base.view_res_config_settings"/>
         <field name="arch" type="xml">
-            <xpath expr="//div[@id='settings']" position="inside">
-                <div class="app_settings_block" data-string="Google Image Search">
-                    <h2>Google Custom Search</h2>
-                    <div class="row mt16 o_settings_container">
-                        <div class="col-12 col-lg-6">
-                            <field name="google_api_key"/>
-                            <field name="google_cx"/>
-                        </div>
-                    </div>
-                </div>
+            <xpath expr="//group" position="inside">
+                <group string="Configuración búsqueda de imágenes">
+                    <field name="google_api_key"/>
+                    <field name="google_cx"/>
+                </group>
             </xpath>
         </field>
     </record>
