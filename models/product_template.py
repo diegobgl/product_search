@@ -4,6 +4,8 @@ import re
 from PIL import Image
 import base64
 from io import BytesIO
+from odoo.exceptions import UserError
+
 
 class ProductTemplate(models.Model):
     _inherit = 'product.template'
@@ -16,15 +18,9 @@ class ProductTemplate(models.Model):
         cx = self.env['ir.config_parameter'].sudo().get_param('product_search.google_cx')
         return api_key, cx
 
-    def _es_imagen_valida(self, image_bytes):
+    def _es_imagen_valida(self, image_data):
         try:
-            img = Image.open(BytesIO(image_bytes))
-            width, height = img.size
-            if width < 60 or height < 60:
-                return False
-            colors = img.getcolors(maxcolors=256)
-            if not colors or len(colors) <= 2:
-                return False
+            image_process.image_data_from_base64(base64.b64encode(image_data))
             return True
         except Exception:
             return False
@@ -34,27 +30,58 @@ class ProductTemplate(models.Model):
         for product in self.filtered(lambda p: p.barcode):
             if not api_key or not cx:
                 continue
-            url = f'https://www.googleapis.com/customsearch/v1?q={product.barcode}&cx={cx}&searchType=image&key={api_key}&gl=cl'
+
+            search_url = 'https://www.googleapis.com/customsearch/v1'
+            params = {
+                'q': product.barcode,
+                'cx': cx,
+                'key': api_key,
+                'searchType': 'image',
+                'gl': 'cl',
+                'imgType': 'photo',
+                'num': 10,
+            }
 
             try:
-                response = requests.get(url, timeout=30)
+                response = requests.get(search_url, params=params, timeout=30)
                 response.raise_for_status()
-            except requests.exceptions.RequestException:
+                image_results = response.json().get('items', [])
+            except requests.exceptions.RequestException as e:
+                _logger.warning(f"Google API request failed for product {product.barcode}: {e}")
                 continue
 
-            image_results = response.json().get('items', [])[:5]
+            used_urls = set()
             for image_result in image_results:
-                try:
-                    image_data = requests.get(image_result['link'], timeout=10).content
-                    if self._es_imagen_valida(image_data):
-                        image_base64 = base64.b64encode(image_data).decode('utf-8')
-                        self.env['product.image'].create({
-                            'name': image_result['title'],
-                            'image': image_base64,
-                            'product_tmpl_id': product.id,
-                        })
-                except:
+                image_url = image_result.get('link', '')
+                title = image_result.get('title', 'Imagen')
+                mime_type = image_result.get('mime', '')
+
+                if not image_url or image_url in used_urls:
                     continue
+
+                if not mime_type.startswith('image/') or not image_url.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
+                    continue
+
+                try:
+                    image_response = requests.get(image_url, timeout=10)
+                    image_response.raise_for_status()
+                    image_data = image_response.content
+
+                    if not self._es_imagen_valida(image_data):
+                        continue
+
+                    image_base64 = base64.b64encode(image_data).decode('utf-8')
+                    self.env['product.image'].create({
+                        'name': title,
+                        'image': image_base64,
+                        'product_tmpl_id': product.id,
+                    })
+                    used_urls.add(image_url)
+
+                except Exception as e:
+                    _logger.debug(f"Failed to process image: {e}")
+                    continue
+
         return True
 
     def search_google_images_by_name(self):
