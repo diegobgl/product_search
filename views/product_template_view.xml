@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <!-- Hereda el notebook para agregar la pestaña -->
         <record id="view_product_form_inherit_images" model="ir.ui.view">
             <field name="name">product.template.form.inherit.images</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
+
+                <!-- Botón antes del campo de imagen principal -->
+                <xpath expr="//field[@name='image_1920']" position="before">
+                    <button name="set_main_image" type="object" string="Establecer Imagen Principal" class="oe_highlight"/>
+                </xpath>
+
+                <!-- Pestaña de imágenes externas -->
                 <xpath expr="//page[@name='invoicing']" position="after">
                     <page string="Imágenes externas">
                         <field name="script" widget="html" colspan="4"/>
@@ -13,7 +21,6 @@
                             <tree>
                                 <field name="image" widget="image"/>
                                 <field name="name"/>
-                                <button name="set_as_main" string="Usar como principal" type="object" class="btn-primary"/>
                             </tree>
                             <form>
                                 <group>
