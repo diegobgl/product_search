@@ -11,11 +11,16 @@ class ProductTemplate(models.Model):
     image_ids = fields.One2many('product.image', 'product_tmpl_id', string='Images')
     script = fields.Html('Script')
 
+    def _get_google_config(self):
+        api_key = self.env['ir.config_parameter'].sudo().get_param('product_search.google_api_key')
+        cx = self.env['ir.config_parameter'].sudo().get_param('product_search.google_cx')
+        return api_key, cx
+
     def _es_imagen_valida(self, image_bytes):
         try:
             img = Image.open(BytesIO(image_bytes))
             width, height = img.size
-            if width < 60 or height < 60:  # antes era 100x100
+            if width < 60 or height < 60:
                 return False
             colors = img.getcolors(maxcolors=256)
             if not colors or len(colors) <= 2:
@@ -25,11 +30,11 @@ class ProductTemplate(models.Model):
             return False
 
     def search_google_images(self):
+        api_key, cx = self._get_google_config()
         for product in self.filtered(lambda p: p.barcode):
-            barcode = product.barcode
-            api_key = ''
-            cx = ''
-            url = f'https://www.googleapis.com/customsearch/v1?q={barcode}&cx={cx}&searchType=image&key={api_key}'
+            if not api_key or not cx:
+                continue
+            url = f'https://www.googleapis.com/customsearch/v1?q={product.barcode}&cx={cx}&searchType=image&key={api_key}&gl=cl'
 
             try:
                 response = requests.get(url, timeout=30)
@@ -41,22 +46,23 @@ class ProductTemplate(models.Model):
             for image_result in image_results:
                 try:
                     image_data = requests.get(image_result['link'], timeout=10).content
-                    image_base64 = base64.b64encode(image_data).decode('utf-8')
-                    self.env['product.image'].create({
-                        'name': image_result['title'],
-                        'image': image_base64,
-                        'product_tmpl_id': product.id,
-                    })
+                    if self._es_imagen_valida(image_data):
+                        image_base64 = base64.b64encode(image_data).decode('utf-8')
+                        self.env['product.image'].create({
+                            'name': image_result['title'],
+                            'image': image_base64,
+                            'product_tmpl_id': product.id,
+                        })
                 except:
                     continue
         return True
 
     def search_google_images_by_name(self):
+        api_key, cx = self._get_google_config()
         for product in self.filtered(lambda p: p.name):
-            product_name = product.name
-            api_key = 'AIzaSyAz1mcdCw-x9FQy_GJK0mkGUSqHh438bkE'
-            cx = '3514c820cfa4f46ab'
-            url = f'https://www.googleapis.com/customsearch/v1?q={product_name}&cx={cx}&searchType=image&key={api_key}'
+            if not api_key or not cx:
+                continue
+            url = f'https://www.googleapis.com/customsearch/v1?q={product.name}&cx={cx}&searchType=image&key={api_key}&gl=cl'
 
             try:
                 response = requests.get(url, timeout=30)
@@ -68,16 +74,16 @@ class ProductTemplate(models.Model):
             for image_result in image_results:
                 try:
                     image_data = requests.get(image_result['link'], timeout=10).content
-                    image_base64 = base64.b64encode(image_data).decode('utf-8')
-                    self.env['product.image'].create({
-                        'name': image_result['title'],
-                        'image': image_base64,
-                        'product_tmpl_id': product.id,
-                    })
+                    if self._es_imagen_valida(image_data):
+                        image_base64 = base64.b64encode(image_data).decode('utf-8')
+                        self.env['product.image'].create({
+                            'name': image_result['title'],
+                            'image': image_base64,
+                            'product_tmpl_id': product.id,
+                        })
                 except:
                     continue
         return True
-
 
     def set_main_image(self):
         self.ensure_one()
@@ -92,6 +98,8 @@ class ProductTemplate(models.Model):
         return True
 
     def search_google_info(self):
+        api_key, cx = self._get_google_config()
+
         def extract_price_from_snippet(snippet):
             prices = re.findall(r'\$\s?\d+\.?\d*', snippet)
             if prices:
@@ -100,10 +108,9 @@ class ProductTemplate(models.Model):
             return 0
 
         for product in self:
-            product_name = product.name
-            api_key = 'AIzaSyAz1mcdCw-x9FQy_GJK0mkGUSqHh438bkE'
-            cx = '3514c820cfa4f46ab'
-            url = f'https://www.googleapis.com/customsearch/v1?q={product_name}&cx={cx}&key={api_key}&gl=cl&hl=es'
+            if not api_key or not cx:
+                continue
+            url = f'https://www.googleapis.com/customsearch/v1?q={product.name}&cx={cx}&key={api_key}&gl=cl&hl=es'
 
             try:
                 response = requests.get(url, timeout=30)
