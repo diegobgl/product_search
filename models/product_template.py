@@ -31,57 +31,26 @@ class ProductTemplate(models.Model):
             if not api_key or not cx:
                 continue
 
-            search_url = 'https://www.googleapis.com/customsearch/v1'
-            params = {
-                'q': product.barcode,
-                'cx': cx,
-                'key': api_key,
-                'searchType': 'image',
-                'gl': 'cl',
-                'imgType': 'photo',
-                'num': 10,
-            }
-
+            url = f'https://www.googleapis.com/customsearch/v1?q={product.barcode}&cx={cx}&searchType=image&key={api_key}&gl=cl'
             try:
-                response = requests.get(search_url, params=params, timeout=30)
+                response = requests.get(url, timeout=30)
                 response.raise_for_status()
-                image_results = response.json().get('items', [])
-            except requests.exceptions.RequestException as e:
-                _logger.warning(f"Google API request failed for product {product.barcode}: {e}")
+            except requests.exceptions.RequestException:
                 continue
 
-            used_urls = set()
+            image_results = response.json().get('items', [])[:5]
             for image_result in image_results:
-                image_url = image_result.get('link', '')
-                title = image_result.get('title', 'Imagen')
-                mime_type = image_result.get('mime', '')
-
-                if not image_url or image_url in used_urls:
-                    continue
-
-                if not mime_type.startswith('image/') or not image_url.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
-                    continue
-
                 try:
-                    image_response = requests.get(image_url, timeout=10)
-                    image_response.raise_for_status()
-                    image_data = image_response.content
-
-                    if not self._es_imagen_valida(image_data):
-                        continue
-
-                    image_base64 = base64.b64encode(image_data).decode('utf-8')
-                    self.env['product.image'].create({
-                        'name': title,
-                        'image': image_base64,
-                        'product_tmpl_id': product.id,
-                    })
-                    used_urls.add(image_url)
-
-                except Exception as e:
-                    _logger.debug(f"Failed to process image: {e}")
+                    image_data = requests.get(image_result['link'], timeout=10).content
+                    if self._es_imagen_valida(image_data):
+                        image_base64 = base64.b64encode(image_data).decode('utf-8')
+                        self.env['product.image'].create({
+                            'name': image_result.get('title', 'Google Image'),
+                            'image': image_base64,
+                            'product_tmpl_id': product.id,
+                        })
+                except:
                     continue
-
         return True
 
     def search_google_images_by_name(self):
