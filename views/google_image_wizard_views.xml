@@ -1,17 +1,32 @@
-<?xml version="1.0" encoding="utf-8" ?>
-
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
         <record id="view_google_image_wizard_form" model="ir.ui.view">
             <field name="name">google.image.wizard.form</field>
             <field name="model">googleimage.wizard</field>
             <field name="arch" type="xml">
-                <form string="Google Image Wizard">
-                    <group>
-                        <field name="image_datas" widget="image" options="{'size': (160, 160)}"/>
-                    </group>
+                <form string="Seleccionar imagen de Google">
+                    <sheet>
+                        <group>
+                            <field name="product_tmpl_id" readonly="1"/>
+                            <field name="search_query" readonly="1"/>
+                        </group>
+                        <group string="Seleccion actual">
+                            <field name="selected_image" widget="image" class="oe_avatar"/>
+                            <field name="selected_source_url" readonly="1" widget="url"/>
+                        </group>
+                        <field name="result_line_ids" nolabel="1">
+                            <tree create="0" delete="0" edit="0">
+                                <field name="is_selected" optional="show"/>
+                                <field name="image_1920" widget="image" options="{'size': [90, 90]}"/>
+                                <field name="name"/>
+                                <field name="source_url" widget="url"/>
+                                <button name="action_select" type="object" string="Seleccionar" class="btn-primary"/>
+                            </tree>
+                        </field>
+                    </sheet>
                     <footer>
-                        <button string="Guardar Imágenes" type="object" name="save_images_to_product" class="btn-primary"/>
+                        <button string="Guardar seleccion" type="object" name="action_save_selected_image" class="btn-primary"/>
                         <button string="Cancelar" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

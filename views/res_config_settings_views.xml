@@ -9,16 +9,16 @@
                 <div class="col-12 col-lg-6 o_setting_box" id="product_search_api_config">
                     <div class="o_setting_left_pane"/>
                     <div class="o_setting_right_pane">
-                        <label for="google_api_key" string="Google Images API"/>
+                        <label for="google_api_key" string="Google Programmable Search"/>
                         <div class="text-muted">
-                            Configure su API Key y CX para buscar imágenes automáticamente.
+                            Configure la API Key y el Search Engine ID (CX) para buscar imagenes desde Google Custom Search.
                         </div>
                         <div class="content-group mt16">
                             <label for="google_api_key" class="o_light_label col-lg-3">API Key</label>
                             <field name="google_api_key"/>
                         </div>
                         <div class="content-group mt16">
-                            <label for="google_cx" class="o_light_label col-lg-3">CX</label>
+                            <label for="google_cx" class="o_light_label col-lg-3">Search Engine ID</label>
                             <field name="google_cx"/>
                         </div>
                     </div>

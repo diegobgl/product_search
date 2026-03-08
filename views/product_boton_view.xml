@@ -1,15 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-       <record id="view_product_template_form_inherit" model="ir.ui.view">
-            <field name="name">product.template.form.inherit</field>
+        <record id="view_product_template_form_inherit" model="ir.ui.view">
+            <field name="name">product.template.form.inherit.google.actions</field>
             <field name="model">product.template</field>
             <field name="inherit_id" ref="product.product_template_only_form_view"/>
             <field name="arch" type="xml">
                 <xpath expr="//header" position="inside">
-                    <button string="Buscar imágenes en Google por Código de Barras" type="object" name="search_google_images" class="oe_highlight"/>
-                    <button string="Buscar imágenes en Google por Nombre" type="object" name="search_google_images_by_name" class="oe_highlight"/>
-                    <button string="Eliminar todas las imágenes" type="object" name="delete_all_images" class="oe_highlight"/>
-                    <button string="Buscar información en Google" type="object" name="search_google_info" class="oe_highlight"/>
+                    <button string="Buscar imagenes por codigo de barras" type="object" name="search_google_images" class="oe_highlight"/>
+                    <button string="Buscar imagenes por nombre" type="object" name="search_google_images_by_name" class="oe_highlight"/>
+                    <button string="Eliminar todas las imagenes" type="object" name="delete_all_images"/>
+                    <button string="Buscar informacion en Google" type="object" name="search_google_info"/>
                 </xpath>
             </field>
         </record>
